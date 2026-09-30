@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আউটলেট সেলস টার্গেট ও অ্যাচিভমেন্ট ট্র্যাকার</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f3f4f6;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-shadow-none {
+                box-shadow: none !important;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fa-solid font-bold fa-chart-line text-blue-600"></i>
+                    আউটলেট সেলস ট্র্যাকার
+                </h1>
+                <p class="text-gray-500 text-sm mt-1">মাসের সেলস টার্গেট ও অর্জন ট্র্যাক করুন</p>
+            </div>
+            <div class="flex gap-3 no-print">
+                <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+                    <i class="fa-solid fa-file-excel"></i> CSV ডাউনলোড
+                </button>
+                <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+                    <i class="fa-solid fa-print"></i> প্রিন্ট রিপোর্ট
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. Month Target Overview Box -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 rounded-2xl shadow-lg space-y-6">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-700 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-blue-600/30 text-blue-400 rounded-xl">
+                        <i class="fa-regular fa-calendar-check text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold">মাসের ওভারভিউ সেশন</h2>
+                        <p class="text-slate-400 text-xs">আপনার নির্বাচিত মাস, বছর ও ওভারঅল বাজেট সেট করুন</p>
+                    </div>
+                </div>
+
+                <!-- Input inputs for Month Dropdown, Year Dropdown & Overall Target -->
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto no-print">
+                    <!-- Month Dropdown -->
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">মাস (Month)</label>
+                        <select id="monthSelect" class="bg-slate-800 text-white text-sm px-3 py-2 rounded-lg border border-slate-600 focus:outline-none focus:border-blue-500">
+                            <option value="জানুয়ারি">জানুয়ারি</option>
+                            <option value="ফেব্রুয়ারি">ফেব্রুয়ারি</option>
+                            <option value="মার্চ">মার্চ</option>
+                            <option value="এপ্রিল">এপ্রিল</option>
+                            <option value="মে">মে</option>
+                            <option value="জুন">জুন</option>
+                            <option value="জুলাই">জুলাই</option>
+                            <option value="আগস্ট">আগস্ট</option>
+                            <option value="সেপ্টেম্বর">সেপ্টেম্বর</option>
+                            <option value="অক্টোবর">অক্টোবর</option>
+                            <option value="নভেম্বর">নভেম্বর</option>
+                            <option value="ডিসেম্বর">ডিসেম্বর</option>
+                        </select>
+                    </div>
+
+                    <!-- Year Dropdown -->
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">বছর (Year)</label>
+                        <select id="yearSelect" class="bg-slate-800 text-white text-sm px-3 py-2 rounded-lg border border-slate-600 focus:outline-none focus:border-blue-500">
+                            <option value="২০২৪">২০২৪</option>
+                            <option value="২০২৫">২০২৫</option>
+                            <option value="২০২৬">২০২৬</option>
+                            <option value="২০২৭">২০২৭</option>
+                            <option value="২০২৮">২০২৮</option>
+                            <option value="২০২৯">২০২৯</option>
+                            <option value="২০৩০">২০৩০</option>
+                        </select>
+                    </div>
+
+                    <!-- Month Target -->
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Month Target (টাকা)</label>
+                        <input type="number" id="overallTargetInput" placeholder="৳ 0" 
+                            class="bg-slate-800 text-white text-sm px-3 py-2 rounded-lg border border-slate-600 focus:outline-none focus:border-blue-500">
+                    </div>
+
+                    <button onclick="updateMonthOverview()" class="mt-5 bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg font-medium transition">
+                        সেভ করুন
+                    </button>
+                </div>
+            </div>
+
+            <!-- Calculated KPI Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                    <span class="text-xs text-slate-400 block mb-1">Month Name</span>
+                    <span id="displayMonthName" class="text-lg font-bold text-blue-400">অক্টোবর ২০২৬</span>
+                </div>
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                    <span class="text-xs text-slate-400 block mb-1">Month Target</span>
+                    <span id="displayMonthTarget" class="text-lg font-bold text-white">৳ 0</span>
+                </div>
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                    <span class="text-xs text-slate-400 block mb-1">Achievement Till Now</span>
+                    <span id="displayAchievement" class="text-lg font-bold text-emerald-400">৳ 0</span>
+                </div>
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                    <span class="text-xs text-slate-400 block mb-1">Achievement %</span>
+                    <span id="displayAchPerc" class="text-lg font-bold text-amber-400">0%</span>
+                </div>
+                <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 col-span-2 md:col-span-1">
+                    <span class="text-xs text-slate-400 block mb-1">বাকি টাকা (Remaining)</span>
+                    <span id="displayRemaining" class="text-lg font-bold text-rose-400">৳ 0</span>
+                    <span id="displayRemPerc" class="text-xs text-slate-400 block mt-0.5">(বাকি: 100%)</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div>
+                <div class="flex justify-between text-xs text-slate-400 mb-1">
+                    <span>অর্জনের অগ্রগতি (Progress)</span>
+                    <span id="progressBarLabel">0% অর্জিত</span>
+                </div>
+                <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-emerald-400 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Add/Edit Outlet Form -->
+        <div id="formContainer" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 no-print space-y-4 transition-all">
+            <div class="flex justify-between items-center">
+                <h3 id="formTitle" class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle text-blue-600"></i> নতুন আউটলেট এন্ট্রি করুন
+                </h3>
+                <button id="cancelEditBtn" onclick="resetFormState()" class="hidden text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg font-medium transition">
+                    বাতিল করুন
+                </button>
+            </div>
+            
+            <form id="outletForm" onsubmit="handleFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <input type="hidden" id="editingId" value="">
+
+                <!-- Outlet Select -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Outlet (ব্র্যান্ড)</label>
+                    <select id="outletChain" required class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="">সিলেক্ট করুন</option>
+                        <option value="Agora">Agora</option>
+                        <option value="Unimart">Unimart</option>
+                        <option value="Meena Bazar">Meena Bazar</option>
+                        <option value="Big Bazar">Big Bazar</option>
+                        <option value="Other">অন্যান্য</option>
+                    </select>
+                </div>
+
+                <!-- Outlet Name / Location -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Outlet Name (এলাকা/লোকেশন)</label>
+                    <input type="text" id="outletLocation" placeholder="যেমন: Segunbagicha, Wari" required 
+                        class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <!-- Month Target -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Month Target (টাকা)</label>
+                    <input type="number" id="outletTarget" placeholder="0" required min="0" oninput="calculateLivePerc()"
+                        class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <!-- Achievement Till Now -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Achivment Till Now (টাকা)</label>
+                    <input type="number" id="outletAchieved" placeholder="0" required min="0" oninput="calculateLivePerc()"
+                        class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <!-- Live Auto % preview & Submit -->
+                <div class="flex items-end gap-2">
+                    <div class="flex-1 bg-gray-100 p-2.5 rounded-xl text-center border border-gray-200">
+                        <span class="block text-[10px] text-gray-500 font-semibold">অটো Achievement %</span>
+                        <span id="livePerc" class="text-sm font-bold text-blue-600">0%</span>
+                    </div>
+                    <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus text-base"></i> <span id="submitBtnText">যোগ করুন</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 3. Outlets Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden print-shadow-none">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-store text-blue-600"></i> আউটলেট তালিকা ও অর্জন বিবরণী
+                </h3>
+                <button onclick="clearAllData()" class="no-print text-xs text-rose-500 hover:underline">
+                    সব রিসেট করুন
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100 text-gray-600 text-xs">
+                            <th class="p-4 whitespace-nowrap">#</th>
+                            <th class="p-4 whitespace-nowrap min-w-[120px]">Outlet</th>
+                            <th class="p-4 whitespace-nowrap min-w-[160px]">Outlet Name (Location)</th>
+                            <th class="p-4 text-right whitespace-nowrap min-w-[140px]">Month Target</th>
+                            <th class="p-4 text-right whitespace-nowrap min-w-[160px]">Achivment Till Now</th>
+                            <th class="p-4 text-center whitespace-nowrap min-w-[160px]">Achivment Till Now %</th>
+                            <th class="p-4 text-right whitespace-nowrap min-w-[140px]">বাকি টাকা</th>
+                            <th class="p-4 text-center whitespace-nowrap min-w-[100px] no-print">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="outletTableBody" class="divide-y divide-gray-100 text-gray-700">
+                        <!-- Dynamic Rows -->
+                    </tbody>
+                    <tfoot class="bg-gray-50 font-bold border-t border-gray-200 text-gray-800">
+                        <tr>
+                            <td colspan="3" class="p-4 text-right whitespace-nowrap">সর্বমোট (Total Target & Achievement):</td>
+                            <td id="totalMonthTargetCell" class="p-4 text-right text-blue-700 whitespace-nowrap">৳ 0</td>
+                            <td id="totalAchievementCell" class="p-4 text-right text-emerald-700 whitespace-nowrap">৳ 0</td>
+                            <td id="totalAchPercCell" class="p-4 text-center text-amber-700 whitespace-nowrap">0%</td>
+                            <td id="totalRemainingCell" class="p-4 text-right text-rose-700 whitespace-nowrap">৳ 0</td>
+                            <td class="p-4 no-print"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let appState = {
+            selectedMonth: 'অক্টোবর',
+            selectedYear: '২০২৬',
+            overallTarget: 0,
+            outlets: []
+        };
+
+        window.onload = function() {
+            const saved = localStorage.getItem('outlet_sales_tracker_data_v3');
+            if(saved) {
+                appState = JSON.parse(saved);
+            }
+            
+            if(appState.selectedMonth) document.getElementById('monthSelect').value = appState.selectedMonth;
+            if(appState.selectedYear) document.getElementById('yearSelect').value = appState.selectedYear;
+            document.getElementById('overallTargetInput').value = appState.overallTarget || '';
+            
+            renderApp();
+        };
+
+        function saveData() {
+            localStorage.setItem('outlet_sales_tracker_data_v3', JSON.stringify(appState));
+            renderApp();
+        }
+
+        function calculateLivePerc() {
+            const target = parseFloat(document.getElementById('outletTarget').value) || 0;
+            const achieved = parseFloat(document.getElementById('outletAchieved').value) || 0;
+            const perc = target > 0 ? ((achieved / target) * 100).toFixed(1) : 0;
+            document.getElementById('livePerc').innerText = perc + '%';
+        }
+
+        function updateMonthOverview() {
+            appState.selectedMonth = document.getElementById('monthSelect').value;
+            appState.selectedYear = document.getElementById('yearSelect').value;
+            appState.overallTarget = parseFloat(document.getElementById('overallTargetInput').value) || 0;
+            saveData();
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const editingId = document.getElementById('editingId').value;
+            const chain = document.getElementById('outletChain').value;
+            const location = document.getElementById('outletLocation').value;
+            const target = parseFloat(document.getElementById('outletTarget').value) || 0;
+            const achieved = parseFloat(document.getElementById('outletAchieved').value) || 0;
+
+            if (editingId) {
+                const index = appState.outlets.findIndex(item => item.id == editingId);
+                if (index !== -1) {
+                    appState.outlets[index] = {
+                        id: Number(editingId),
+                        chain,
+                        location,
+                        target,
+                        achieved
+                    };
+                }
+            } else {
+                const newItem = {
+                    id: Date.now(),
+                    chain,
+                    location,
+                    target,
+                    achieved
+                };
+                appState.outlets.push(newItem);
+            }
+
+            saveData();
+            resetFormState();
+        }
+
+        function editOutlet(id) {
+            const item = appState.outlets.find(o => o.id === id);
+            if (!item) return;
+
+            document.getElementById('editingId').value = item.id;
+            document.getElementById('outletChain').value = item.chain;
+            document.getElementById('outletLocation').value = item.location;
+            document.getElementById('outletTarget').value = item.target;
+            document.getElementById('outletAchieved').value = item.achieved;
+
+            calculateLivePerc();
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500"></i> আউটলেট আপডেট করুন`;
+            document.getElementById('submitBtn').className = "bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl font-medium transition flex items-center justify-center gap-2";
+            document.getElementById('submitBtnText').innerText = "আপডেট করুন";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+            document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetFormState() {
+            document.getElementById('outletForm').reset();
+            document.getElementById('editingId').value = "";
+            document.getElementById('livePerc').innerText = '0%';
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-plus-circle text-blue-600"></i> নতুন আউটলেট এন্ট্রি করুন`;
+            document.getElementById('submitBtn').className = "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium transition flex items-center justify-center gap-2";
+            document.getElementById('submitBtnText').innerText = "যোগ করুন";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        function deleteOutlet(id) {
+            if (confirm('আপনি কি নিশ্চিত এই রেকর্ডটি মুছে ফেলতে চান?')) {
+                appState.outlets = appState.outlets.filter(item => item.id !== id);
+                saveData();
+                if (document.getElementById('editingId').value == id) {
+                    resetFormState();
+                }
+            }
+        }
+
+        function renderApp() {
+            const combinedMonthName = `${appState.selectedMonth || 'অক্টোবর'} ${appState.selectedYear || '২০২৬'}`;
+            document.getElementById('displayMonthName').innerText = combinedMonthName;
+            document.getElementById('displayMonthTarget').innerText = '৳ ' + (appState.overallTarget || 0).toLocaleString('bn-BD');
+
+            let sumOutletTargets = 0;
+            let sumOutletAchievements = 0;
+
+            appState.outlets.forEach(o => {
+                sumOutletTargets += o.target;
+                sumOutletAchievements += o.achieved;
+            });
+
+            const effectiveTarget = appState.overallTarget > 0 ? appState.overallTarget : sumOutletTargets;
+            const achPerc = effectiveTarget > 0 ? ((sumOutletAchievements / effectiveTarget) * 100).toFixed(1) : 0;
+            const remaining = Math.max(0, effectiveTarget - sumOutletAchievements);
+            const remainingPerc = effectiveTarget > 0 ? ((remaining / effectiveTarget) * 100).toFixed(1) : 0;
+
+            document.getElementById('displayAchievement').innerText = '৳ ' + sumOutletAchievements.toLocaleString('bn-BD');
+            document.getElementById('displayAchPerc').innerText = achPerc + '%';
+            document.getElementById('displayRemaining').innerText = '৳ ' + remaining.toLocaleString('bn-BD');
+            document.getElementById('displayRemPerc').innerText = `(বাকি: ${remainingPerc}%)`;
+
+            const boundedPerc = Math.min(100, Math.max(0, achPerc));
+            document.getElementById('progressBar').style.width = boundedPerc + '%';
+            document.getElementById('progressBarLabel').innerText = `${achPerc}% অর্জিত`;
+
+            const tbody = document.getElementById('outletTableBody');
+            tbody.innerHTML = '';
+
+            if (appState.outlets.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-gray-400">এখনো কোনো তথ্য যোগ করা হয়নি। উপরের ফর্মে তথ্য দিন।</td></tr>`;
+            } else {
+                appState.outlets.forEach((item, index) => {
+                    const itemPerc = item.target > 0 ? ((item.achieved / item.target) * 100).toFixed(1) : 0;
+                    const itemRem = Math.max(0, item.target - item.achieved);
+
+                    let badgeClass = "bg-amber-100 text-amber-800";
+                    if (itemPerc >= 100) badgeClass = "bg-emerald-100 text-emerald-800";
+                    else if (itemPerc < 50) badgeClass = "bg-rose-100 text-rose-800";
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 transition";
+                    tr.innerHTML = `
+                        <td class="p-4 font-medium text-gray-400 whitespace-nowrap">${index + 1}</td>
+                        <td class="p-4 font-semibold text-gray-800 whitespace-nowrap">${item.chain}</td>
+                        <td class="p-4 text-gray-600 whitespace-nowrap">${item.location}</td>
+                        <td class="p-4 text-right font-medium whitespace-nowrap">৳ ${item.target.toLocaleString('bn-BD')}</td>
+                        <td class="p-4 text-right font-medium text-emerald-600 whitespace-nowrap">৳ ${item.achieved.toLocaleString('bn-BD')}</td>
+                        <td class="p-4 text-center whitespace-nowrap">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">
+                                ${itemPerc}%
+                            </span>
+                        </td>
+                        <td class="p-4 text-right text-rose-600 font-medium whitespace-nowrap">৳ ${itemRem.toLocaleString('bn-BD')}</td>
+                        <td class="p-4 text-center whitespace-nowrap no-print">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="editOutlet(${item.id})" class="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition" title="এডিট করুন">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="deleteOutlet(${item.id})" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="ডিলিট করুন">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('totalMonthTargetCell').innerText = '৳ ' + sumOutletTargets.toLocaleString('bn-BD');
+            document.getElementById('totalAchievementCell').innerText = '৳ ' + sumOutletAchievements.toLocaleString('bn-BD');
+            const totalTablePerc = sumOutletTargets > 0 ? ((sumOutletAchievements / sumOutletTargets) * 100).toFixed(1) : 0;
+            document.getElementById('totalAchPercCell').innerText = totalTablePerc + '%';
+            document.getElementById('totalRemainingCell').innerText = '৳ ' + Math.max(0, sumOutletTargets - sumOutletAchievements).toLocaleString('bn-BD');
+        }
+
+        function exportCSV() {
+            let csv = 'Outlet,Location,Month Target,Achivment Till Now,Achivment %\n';
+            appState.outlets.forEach(o => {
+                const perc = o.target > 0 ? ((o.achieved / o.target) * 100).toFixed(1) : 0;
+                csv += `"${o.chain}","${o.location}",${o.target},${o.achieved},${perc}%\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', `Outlet_Sales_Report_${appState.selectedMonth}_${appState.selectedYear}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function clearAllData() {
+            if(confirm('আপনি কি নিশ্চিত যে সব তথ্য মুছে ফেলতে চান?')) {
+                appState.outlets = [];
+                saveData();
+                resetFormState();
+            }
+        }
+    </script>
+</body>
+</html>
